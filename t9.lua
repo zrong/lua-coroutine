@@ -3,7 +3,31 @@
 require 'socket'
 
 host = 'www.w3.org'
-file = '/TR/html5/'
+threads = {}
+
+function get(host, file)
+    local co = coroutine.create(function()
+        download(host, file)
+    end)
+    table.insert(threads, co)
+end
+
+function dispatch()
+    local i = 1
+    while true do
+        if threads[i] == nil then
+            if threads[1] == nil then break end
+            i=1
+        end
+        local status, res = coroutine.resume(threads[i])
+        print(i, status, res)
+        if not res then
+            table.remove(threads, i)
+        else
+            i = i + 1
+        end
+    end
+end
 
 function download(host, file)
     local c = assert(socket.connect(host, 80))
@@ -27,3 +51,12 @@ function receive(conn)
     end
     return s or partial, status
 end
+
+get(host, '/TR/html401/')
+get(host, '/TR/json-ld-api/')
+get(host, '/TR/WD-HTTP-NG-interfaces/')
+get(host, '/TR/html5/')
+
+
+
+dispatch()
