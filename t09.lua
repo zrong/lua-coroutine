@@ -2,7 +2,6 @@
 
 require 'socket'
 
-host = 'www.w3.org'
 threads = {}
 
 function get(host, file)
@@ -20,7 +19,7 @@ function dispatch()
             i=1
         end
         local status, res = coroutine.resume(threads[i])
-        print(i, status, res)
+        --print(i, status, res)
         if not res then
             table.remove(threads, i)
         else
@@ -52,11 +51,20 @@ function receive(conn)
     return s or partial, status
 end
 
+---[[
+host = 'www.homeinns.com'
+get(host, '/list/shanghai')
+get(host, '/list/wuhan')
+get(host, '/list/beijing')
+get(host, '/list/shenzhen')
+--]]
+
+--[[
+host = 'www.w3.org'
 get(host, '/TR/html401/')
 get(host, '/TR/json-ld-api/')
 get(host, '/TR/WD-HTTP-NG-interfaces/')
 get(host, '/TR/html5/')
-
-
+--]]
 
 dispatch()
